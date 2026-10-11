@@ -27,7 +27,7 @@ export default function AdminNav() {
     <div className="bg-slate-900 text-white border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
+
           {/* LOGO & ADMIN BADGE */}
           <div className="flex items-center gap-6">
             <Link href="/admin" className="flex items-center gap-2 font-bold text-lg">
@@ -46,11 +46,10 @@ export default function AdminNav() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      isActive
-                        ? 'bg-indigo-600 text-white'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-800'
-                    }`}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${isActive
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     <span>{item.name}</span>

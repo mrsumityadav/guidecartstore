@@ -47,10 +47,10 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
+
           {/* LEFT COLUMN: HEADLINE, DESCRIPTION, SEARCH, AND CTAS */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            
+
             {/* EYEBROW BADGE */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm text-xs font-semibold tracking-wider uppercase text-slate-200">
               <span className="w-2 h-2 rounded-full bg-[#FF8A00] animate-pulse" />
@@ -59,7 +59,7 @@ export default function Hero() {
 
             {/* MAIN EDITORIAL HEADLINE */}
             <h1 className="font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.12]">
-              Practical Resources.{' '}
+              <span style={{ color: '#FFFFFF' }}>Practical Resources.</span>{' '}
               <span className="text-[#FF8A00] underline decoration-[#FF8A00]/40 decoration-4 underline-offset-8">
                 Smarter Progress.
               </span>
@@ -130,7 +130,7 @@ export default function Hero() {
           {/* RIGHT COLUMN: REFINED EDITORIAL BOOK COVER & PREVIEW COMPOSITION */}
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             <div className="relative mx-auto max-w-md lg:max-w-none">
-              
+
               {/* BACK LAYER CARD (Productivity Planner) */}
               <div className="absolute -top-6 -right-3 sm:-right-6 w-11/12 bg-white/10 backdrop-blur-md border border-white/15 rounded-3xl p-5 shadow-2xl transform rotate-2 pointer-events-none hidden sm:block">
                 <div className="flex items-center justify-between text-[11px] text-slate-300 font-mono pb-2 border-b border-white/10">

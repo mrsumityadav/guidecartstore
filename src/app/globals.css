@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-poppins: var(--font-poppins), 'Poppins', sans-serif;
+  --font-inter: var(--font-inter), 'Inter', sans-serif;
+
+  /* Premium Brand Palette */
+  --primary-navy: #0B1635;
+  --secondary-navy: #173B75;
+  --deep-navy: #071126;
+  --accent-orange: #FF8A00;
+  --orange-hover: #E87500;
+  --main-bg: #FAF9F6;
+  --alt-bg: #F1F5FB;
+  --card-bg: #FFFFFF;
+  --main-text: #0B1635;
+  --body-text: #263449;
+  --muted-text: #64748B;
+  --border-light: #E2E8F0;
+  --white: #FFFFFF;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base Body Styles */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FAF9F6;
+  color: #263449;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-poppins), 'Poppins', sans-serif;
+  color: #0B1635;
+  letter-spacing: -0.02em;
+}
+
+p, span, div, input, textarea, select, button, .font-body {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+}
+
+/* Custom Palette Utility Classes */
+.bg-navy-deep {
+  background-color: #071126;
+}
+
+.bg-navy-primary {
+  background-color: #0B1635;
+}
+
+.bg-navy-secondary {
+  background-color: #173B75;
+}
+
+.bg-accent-orange {
+  background-color: #FF8A00;
+}
+
+.hover\:bg-orange-hover:hover {
+  background-color: #E87500;
+}
+
+.bg-main-bg {
+  background-color: #FAF9F6;
+}
+
+.bg-alt-bg {
+  background-color: #F1F5FB;
+}
+
+.bg-card-bg {
+  background-color: #FFFFFF;
+}
+
+.text-navy-deep {
+  color: #071126;
+}
+
+.text-navy-primary {
+  color: #0B1635;
+}
+
+.text-navy-secondary {
+  color: #173B75;
+}
+
+.text-accent-orange {
+  color: #FF8A00;
+}
+
+.text-body-custom {
+  color: #263449;
+}
+
+.text-muted-custom {
+  color: #64748B;
+}
+
+.border-custom {
+  border-color: #E2E8F0;
+}
+
+/* Hero Section Gradient */
+.hero-gradient {
+  background: linear-gradient(120deg, #071126 0%, #102B59 55%, #214B80 100%);
+}
+
+/* Card Glow and Subtle Shadows */
+.card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(11, 22, 53, 0.05), 0 2px 6px -1px rgba(11, 22, 53, 0.03);
+}
+
+.card-shadow-hover {
+  box-shadow: 0 16px 32px -4px rgba(11, 22, 53, 0.1), 0 6px 12px -2px rgba(11, 22, 53, 0.05);
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

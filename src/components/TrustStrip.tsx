@@ -7,42 +7,45 @@ export default function TrustStrip() {
   const valuePoints = [
     {
       icon: Zap,
-      title: 'Instant Digital Access',
-      desc: 'Get immediate access to your downloadable files after purchase.'
+      title: 'Instant Fulfillment',
+      desc: 'Immediate download access right on screen and sent to your email after checkout.'
     },
     {
       icon: CheckCircle2,
-      title: 'Practical & Useful',
-      desc: 'Designed to solve real problems without unnecessary filler.'
+      title: 'High-Yield & Practical',
+      desc: 'Focused checklists and frameworks engineered to solve specific problems without filler.'
     },
     {
       icon: ShieldCheck,
       title: 'Secure Checkout',
-      desc: 'Safe & seamless payment processed reliably via Payhip.'
+      desc: 'Safe & reliable 256-bit encrypted payments processed directly via Payhip.'
     },
     {
       icon: Download,
-      title: 'Easy to Use & Print',
-      desc: 'High-quality PDF formats optimized for mobile, tablet, and paper.'
+      title: 'Universal PDF Formats',
+      desc: 'High-resolution PDFs optimized for reading on mobile, tablet, laptop, and paper.'
     }
   ];
 
   return (
-    <section className="py-8 bg-slate-50/70 dark:bg-slate-900/60 border-y border-slate-200/60 dark:border-slate-800">
+    <section className="py-8 bg-white border-b border-[#E2E8F0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {valuePoints.map((item, idx) => {
-            const IconComponent = item.icon;
+            const Icon = item.icon;
             return (
-              <div key={idx} className="flex items-start gap-3.5 p-3 rounded-2xl bg-white/60 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80 shadow-xs">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                  <IconComponent className="w-5 h-5 stroke-[1.8]" />
+              <div
+                key={idx}
+                className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-[#F1F5FB]/70 border border-[#E2E8F0] card-shadow"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white text-[#FF8A00] flex items-center justify-center shrink-0 border border-[#E2E8F0] shadow-xs">
+                  <Icon className="w-5 h-5 stroke-[1.8]" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                  <h4 className="font-heading font-bold text-sm text-[#0B1635] leading-tight">
                     {item.title}
                   </h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-snug">
+                  <p className="text-xs text-[#64748B] mt-1 leading-snug">
                     {item.desc}
                   </p>
                 </div>

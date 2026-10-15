@@ -1,46 +1,35 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Metadata } from 'next';
+import { getCategoriesWithCounts } from '@/data/categories';
 import CategoriesSection from '@/components/CategoriesSection';
-import LoadingState from '@/components/LoadingState';
-import { Category } from '@/types';
-import { fetchCategories } from '@/lib/api';
+import { Layers } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Resource Categories | GuideCart Store',
+  description: 'Explore our organized collections of e-books, PDF guides, career toolkits, planners, and learning printables.',
+};
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const data = await fetchCategories();
-      setCategories(data);
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const categories = getCategoriesWithCounts();
 
   return (
-    <div className="py-12 md:py-16 bg-white dark:bg-slate-950 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="text-center max-w-2xl mx-auto">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Catalog Directory
-          </span>
-          <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-1">
+    <div className="py-12 md:py-20 bg-[#FAF9F6] min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#E2E8F0] text-xs font-semibold text-[#0B1635]">
+            <Layers className="w-3.5 h-3.5 text-[#FF8A00]" />
+            <span>Catalog Directory</span>
+          </div>
+          <h1 className="font-heading font-extrabold text-4xl sm:text-5xl text-[#0B1635] tracking-tight">
             Product Categories
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
-            Explore resources organized by category to find the exact toolkit, guide, planner or checklist you need.
+          <p className="text-[#64748B] text-sm sm:text-base leading-relaxed">
+            Explore resources organized by focus area to find the exact toolkit, guide, planner, or checklist you need.
           </p>
         </div>
       </div>
 
-      {loading ? (
-        <LoadingState message="Fetching categories..." />
-      ) : (
-        <CategoriesSection categories={categories} />
-      )}
+      <CategoriesSection categories={categories} />
     </div>
   );
 }

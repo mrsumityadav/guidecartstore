@@ -1,15 +1,12 @@
-'use client';
-
-import React, { useEffect, useState, use, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
-import { Product } from '@/types';
-import { fetchProductBySlug, fetchProducts } from '@/lib/api';
+import { Metadata } from 'next';
+import { getAllProducts, getProductBySlug, getRelatedProducts } from '@/data/products';
 import BuyNowButton from '@/components/BuyNowButton';
 import ProductGallery from '@/components/ProductGallery';
 import FeatureList from '@/components/FeatureList';
 import FAQAccordion from '@/components/FAQAccordion';
 import ProductGrid from '@/components/ProductGrid';
-import LoadingState from '@/components/LoadingState';
 import EmptyState from '@/components/EmptyState';
 import {
   FileText,
@@ -19,61 +16,64 @@ import {
   Sparkles,
   Flame,
   ArrowLeft,
-  Lock
+  Lock,
+  Zap
 } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-function ProductDetailInner({ params }: PageProps) {
-  const { slug } = use(params);
+// 1. Static pre-rendering for all product slugs
+export async function generateStaticParams() {
+  const products = getAllProducts();
+  return products.map((p) => ({
+    slug: p.slug,
+  }));
+}
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+// 2. SEO Metadata per product
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
-  useEffect(() => {
-    async function loadProductData() {
-      setLoading(true);
-      try {
-        const data = await fetchProductBySlug(slug);
-        setProduct(data);
-
-        if (data && data.category) {
-          const categoryProducts = await fetchProducts({ category: data.category });
-          setRelatedProducts(categoryProducts.filter((p) => p._id !== data._id).slice(0, 4));
-        }
-      } catch (err) {
-        console.error('Error loading product page:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (slug) {
-      loadProductData();
-    }
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <div className="py-20">
-        <LoadingState message="Fetching digital product details..." />
-      </div>
-    );
+  if (!product) {
+    return {
+      title: 'Product Not Found | GuideCart Store',
+      description: 'The requested digital resource could not be found.'
+    };
   }
+
+  return {
+    title: `${product.title} | GuideCart Store`,
+    description: product.shortDescription,
+    openGraph: {
+      title: `${product.title} | GuideCart`,
+      description: product.shortDescription,
+      images: [product.thumbnail],
+      type: 'website'
+    }
+  };
+}
+
+async function ProductDetailContent({ params }: PageProps) {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
 
   if (!product) {
     return (
-      <div className="py-20 max-w-xl mx-auto px-4 text-center">
+      <div className="py-24 max-w-xl mx-auto px-4 text-center">
         <EmptyState
           title="Product Not Found"
-          description="The requested digital product could not be loaded or is unavailable."
+          description="We could not find the digital resource you were looking for. It may have been moved or updated."
         />
-        <div className="mt-4">
-          <Link href="/shop" className="text-xs font-bold text-indigo-600 hover:underline">
-            Return to Shop
+        <div className="mt-6">
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-2 bg-[#0B1635] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#173B75] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Catalog</span>
           </Link>
         </div>
       </div>
@@ -81,27 +81,32 @@ function ProductDetailInner({ params }: PageProps) {
   }
 
   const currencySymbol = product.currency === 'INR' ? '₹' : '$';
-  const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
+  const hasGenuineDiscount =
+    product.compareAtPrice !== undefined &&
+    product.compareAtPrice !== null &&
+    product.compareAtPrice > product.price;
+
+  const relatedProducts = getRelatedProducts(product.category, product.slug, 4);
 
   return (
-    <div className="py-10 md:py-16 bg-white dark:bg-slate-950">
+    <div className="py-10 md:py-16 bg-[#FAF9F6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* BREADCRUMB / BACK LINK */}
         <div className="mb-8">
           <Link
             href="/shop"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-indigo-600 transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748B] hover:text-[#0B1635] transition-colors group"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Shop</span>
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to All Resources</span>
           </Link>
         </div>
 
         {/* MAIN PRODUCT HEADER GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start mb-16">
           
-          {/* LEFT: PREVIEW GALLERY */}
+          {/* LEFT COLUMN: PREVIEW GALLERY */}
           <div className="lg:col-span-6">
             <ProductGallery
               thumbnail={product.thumbnail}
@@ -110,64 +115,64 @@ function ProductDetailInner({ params }: PageProps) {
             />
           </div>
 
-          {/* RIGHT: DETAILS & BUY ACTION */}
+          {/* RIGHT COLUMN: DETAILS & BUY ACTION */}
           <div className="lg:col-span-6 space-y-6">
             
             {/* BADGES & CATEGORY */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-100 dark:border-indigo-900/40">
+              <span className="text-xs font-bold text-[#FF8A00] uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
                 {product.category}
               </span>
 
               {product.bestseller && (
-                <span className="inline-flex items-center gap-1 bg-amber-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 bg-[#FF8A00] text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-xs">
                   <Flame className="w-3 h-3 fill-current" />
                   Bestseller
                 </span>
               )}
 
               {product.featured && !product.bestseller && (
-                <span className="inline-flex items-center gap-1 bg-indigo-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  <Sparkles className="w-3 h-3" />
+                <span className="inline-flex items-center gap-1 bg-[#0B1635] text-white text-xs font-bold px-2.5 py-0.5 rounded-full shadow-xs">
+                  <Sparkles className="w-3 h-3 text-[#FF8A00]" />
                   Featured
                 </span>
               )}
 
-              <span className="text-xs font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full">
-                {product.productType || 'PDF Resource'}
+              <span className="text-xs font-semibold text-[#64748B] bg-white border border-[#E2E8F0] px-2.5 py-0.5 rounded-full">
+                {product.productType || 'Digital Resource'}
               </span>
             </div>
 
-            {/* TITLE */}
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            {/* PRODUCT TITLE */}
+            <h1 className="font-heading font-extrabold text-3xl sm:text-4xl text-[#0B1635] tracking-tight leading-tight">
               {product.title}
             </h1>
 
             {/* SHORT DESCRIPTION */}
-            <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              {product.shortDescription || product.description.slice(0, 180)}
+            <p className="text-base text-[#263449] leading-relaxed">
+              {product.shortDescription}
             </p>
 
-            {/* PRICE & PAYHIP BUY NOW CTA CARD */}
-            <div className="p-6 bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-3xl space-y-4 shadow-sm">
+            {/* PRICE & PAYHIP BUY CARD */}
+            <div className="p-6 bg-white border border-[#E2E8F0] rounded-3xl space-y-5 card-shadow">
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
+                <span className="text-3xl sm:text-4xl font-black text-[#0B1635]">
                   {currencySymbol}{product.price}
                 </span>
-                {hasDiscount && (
-                  <span className="text-lg text-slate-400 line-through">
+                {hasGenuineDiscount && (
+                  <span className="text-lg text-[#64748B] line-through">
                     {currencySymbol}{product.compareAtPrice}
                   </span>
                 )}
-                {hasDiscount && (
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-1 rounded-md">
+                {hasGenuineDiscount && (
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
                     Save {currencySymbol}{(product.compareAtPrice || 0) - product.price}
                   </span>
                 )}
               </div>
 
-              {/* BUY NOW BUTTON INTEGRATED WITH PAYHIP KEY */}
-              <div className="pt-2">
+              {/* PAYHIP CHECKOUT ACTION BUTTON */}
+              <div>
                 <BuyNowButton
                   payhipKey={product.payhipKey}
                   price={product.price}
@@ -179,89 +184,116 @@ function ProductDetailInner({ params }: PageProps) {
                 />
               </div>
 
-              <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-200/60 dark:border-slate-800">
+              {/* SECURITY & FULFILLMENT ASSURANCES */}
+              <div className="flex flex-wrap items-center justify-between text-xs text-[#64748B] pt-3 border-t border-[#E2E8F0] gap-2">
                 <div className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-emerald-500" />
+                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Secure Payhip Checkout</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Download className="w-3.5 h-3.5 text-indigo-500" />
-                  <span>Instant Delivery</span>
+                  <Download className="w-3.5 h-3.5 text-[#FF8A00]" />
+                  <span>Instant Lifetime Access</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Direct Delivery</span>
                 </div>
               </div>
             </div>
 
-            {/* QUICK SPECS GRID */}
+            {/* QUICK PRODUCT SPECIFICATIONS */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-center">
-                <FileText className="w-5 h-5 text-indigo-600 mx-auto mb-1 stroke-[1.8]" />
-                <span className="block text-[10px] uppercase font-bold text-slate-400">File Format</span>
-                <span className="font-semibold text-xs text-slate-800 dark:text-slate-200">{product.fileFormat || 'PDF'}</span>
+              <div className="p-3 bg-white border border-[#E2E8F0] rounded-2xl text-center">
+                <FileText className="w-5 h-5 text-[#FF8A00] mx-auto mb-1 stroke-[1.8]" />
+                <span className="block text-[10px] uppercase font-bold text-[#64748B]">File Format</span>
+                <span className="font-bold text-xs text-[#0B1635]">{product.fileFormat || 'PDF'}</span>
               </div>
 
-              <div className="p-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-center">
-                <FileCheck className="w-5 h-5 text-indigo-600 mx-auto mb-1 stroke-[1.8]" />
-                <span className="block text-[10px] uppercase font-bold text-slate-400">Length</span>
-                <span className="font-semibold text-xs text-slate-800 dark:text-slate-200">{product.pageCount || 35} Pages</span>
+              <div className="p-3 bg-white border border-[#E2E8F0] rounded-2xl text-center">
+                <FileCheck className="w-5 h-5 text-[#0B1635] mx-auto mb-1 stroke-[1.8]" />
+                <span className="block text-[10px] uppercase font-bold text-[#64748B]">Length</span>
+                <span className="font-bold text-xs text-[#0B1635]">{product.pageCount || 25} Pages</span>
               </div>
 
-              <div className="p-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-center">
+              <div className="p-3 bg-white border border-[#E2E8F0] rounded-2xl text-center">
                 <Globe className="w-5 h-5 text-indigo-600 mx-auto mb-1 stroke-[1.8]" />
-                <span className="block text-[10px] uppercase font-bold text-slate-400">Language</span>
-                <span className="font-semibold text-xs text-slate-800 dark:text-slate-200">{product.language || 'English'}</span>
+                <span className="block text-[10px] uppercase font-bold text-[#64748B]">Language</span>
+                <span className="font-bold text-xs text-[#0B1635]">{product.language || 'English'}</span>
               </div>
             </div>
 
           </div>
         </div>
 
-        {/* FULL DESCRIPTION & FEATURES */}
-        <div className="py-12 border-t border-slate-200/80 dark:border-slate-800 grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* FULL OVERVIEW & FEATURES SECTION */}
+        <div className="py-12 border-t border-[#E2E8F0] grid grid-cols-1 lg:grid-cols-12 gap-12">
           
-          {/* DESCRIPTION */}
+          {/* LEFT 7 COLS: DESCRIPTION & CHECKLIST */}
           <div className="lg:col-span-7 space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <h2 className="font-heading font-extrabold text-2xl text-[#0B1635]">
               Product Overview & Details
             </h2>
             
-            <div className="prose dark:prose-invert max-w-none text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+            <div className="text-sm text-[#263449] leading-relaxed whitespace-pre-line space-y-4">
               {product.description}
             </div>
 
-            {/* FEATURES COMPONENT */}
-            <div className="pt-6">
+            <div className="pt-4">
               <FeatureList features={product.features} whatYouGet={product.whatYouGet} />
             </div>
           </div>
 
-          {/* FAQ & CTA SIDEBAR */}
+          {/* RIGHT 5 COLS: FAQ & SECONDARY BUY BOX */}
           <div className="lg:col-span-5 space-y-8">
-            {/* FAQ SECTION */}
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+              <h3 className="font-heading font-bold text-xl text-[#0B1635]">
                 Frequently Asked Questions
               </h3>
               
               <FAQAccordion
-                items={product.faq && product.faq.length > 0 ? product.faq : [
-                  { question: "How will I receive my product after checkout?", answer: "Directly after payment on Payhip, you will see an instant download button on screen and receive an email with your lifetime download link." },
-                  { question: "Can I view this on mobile or tablet?", answer: "Yes! The PDF file format is completely compatible with smartphones, tablets, iPads, laptops, and printable on paper." },
-                  { question: "Are future updates included?", answer: "Yes, any future revisions or improvements to this product will be available to you free of charge." }
-                ]}
+                items={
+                  product.faq && product.faq.length > 0
+                    ? product.faq
+                    : [
+                        {
+                          question: 'How will I receive my product after checkout?',
+                          answer:
+                            'Immediately after completing your checkout on Payhip, you will see a download button right on screen. You will also receive an automated email containing your download access link.'
+                        },
+                        {
+                          question: 'Can I view this on mobile or tablet?',
+                          answer:
+                            'Yes! The PDF format is completely compatible with smartphones, tablets, iPads, and computers, and is fully printable.'
+                        },
+                        {
+                          question: 'Are future revisions included?',
+                          answer:
+                            'Yes! Your purchase includes lifetime download access and free updates whenever revisions are released.'
+                        }
+                      ]
+                }
               />
             </div>
 
-            {/* RE-STICKY BUY BOX */}
-            <div className="p-6 bg-indigo-600 text-white rounded-3xl space-y-3 shadow-lg">
-              <h4 className="font-bold text-lg">Ready to Get Started?</h4>
-              <p className="text-xs text-indigo-100 leading-relaxed">
-                Instant digital delivery. Secure checkout powered by Payhip.
-              </p>
+            {/* STICKY RE-ENGAGEMENT PURCHASE BANNER */}
+            <div className="p-6 bg-[#0B1635] text-white rounded-3xl space-y-4 shadow-xl">
+              <div>
+                <span className="text-[10px] font-bold text-[#FF8A00] uppercase tracking-wider block">
+                  Instant Access
+                </span>
+                <h4 className="font-heading font-bold text-lg text-white mt-0.5">
+                  Ready to Start?
+                </h4>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                  Fast and secure checkout processed reliably via Payhip.
+                </p>
+              </div>
+
               <BuyNowButton
                 payhipKey={product.payhipKey}
                 price={product.price}
                 currency={product.currency}
-                variant="secondary"
+                variant="primary"
                 size="md"
                 fullWidth
                 label="Buy Now"
@@ -273,17 +305,25 @@ function ProductDetailInner({ params }: PageProps) {
 
         {/* RELATED PRODUCTS */}
         {relatedProducts.length > 0 && (
-          <div className="py-16 border-t border-slate-200/80 dark:border-slate-800">
+          <div className="py-16 border-t border-[#E2E8F0]">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                You May Also Like
-              </h2>
-              <Link href="/shop" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                View All Collection
+              <div>
+                <h2 className="font-heading font-extrabold text-2xl text-[#0B1635] tracking-tight">
+                  You May Also Like
+                </h2>
+                <p className="text-xs text-[#64748B] mt-1">
+                  More practical resources from the {product.category} collection.
+                </p>
+              </div>
+              <Link
+                href={`/shop?category=${encodeURIComponent(product.category)}`}
+                className="text-xs font-bold text-[#0B1635] hover:text-[#FF8A00] transition-colors"
+              >
+                View Category
               </Link>
             </div>
 
-            <ProductGrid products={relatedProducts} />
+            <ProductGrid products={relatedProducts} columns={4} />
           </div>
         )}
 
@@ -292,10 +332,16 @@ function ProductDetailInner({ params }: PageProps) {
   );
 }
 
-export default function ProductDetailPage({ params }: PageProps) {
+export default function ProductDetailPage(props: PageProps) {
   return (
-    <Suspense fallback={<LoadingState message="Loading details..." />}>
-      <ProductDetailInner params={params} />
+    <Suspense
+      fallback={
+        <div className="min-h-screen py-24 text-center text-[#64748B]">
+          Loading digital product details...
+        </div>
+      }
+    >
+      <ProductDetailContent {...props} />
     </Suspense>
   );
 }

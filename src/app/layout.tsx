@@ -1,35 +1,54 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Poppins, Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import BackgroundDecorations from '@/components/BackgroundDecorations';
+import { Suspense } from 'react';
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
 
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-sans',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'GuideCart | Practical Digital Products for Real Life',
-  description: 'Simple, useful and thoughtfully designed digital resources, ebooks, PDF guides, planners, checklists and career toolkits for everyday growth.',
-  keywords: ['digital products', 'ebooks', 'pdf guides', 'planners', 'interview prep', 'career toolkit', 'checklists', 'printables'],
+  title: 'GuideCart | Practical Digital Bookstore & PDF Resources',
+  description: 'Premium digital bookstore offering high-yield e-books, PDF guides, productivity planners, printables, and career interview toolkits.',
+  keywords: [
+    'GuideCart',
+    'digital bookstore',
+    'ebooks',
+    'PDF guides',
+    'interview prep toolkit',
+    'productivity planners',
+    'printables',
+    'career guides'
+  ],
+  authors: [{ name: 'GuideCart' }],
   openGraph: {
-    title: 'GuideCart | Practical Digital Products',
-    description: 'Simple, useful and thoughtfully designed digital resources to help you learn, prepare, organize and get things done.',
-    url: 'https://guidecart.com',
-    siteName: 'GuideCart',
+    title: 'GuideCart | Practical Digital Bookstore & PDF Resources',
+    description: 'High-quality digital guides, e-books, planners, and career toolkits designed for tangible progress.',
+    url: 'https://guidecartstore.vercel.app',
+    siteName: 'GuideCart Store',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GuideCart | Practical Digital Products',
-    description: 'Practical digital resources, ebooks, PDF guides, planners & interview preparation toolkits.',
+    title: 'GuideCart | Practical Digital Bookstore',
+    description: 'High-quality digital guides, e-books, planners, and career toolkits designed for tangible progress.',
+  },
+  icons: {
+    icon: '/favicon.ico',
   }
 };
-
-import { Suspense } from 'react';
 
 export default function RootLayout({
   children,
@@ -37,13 +56,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="min-h-screen flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
-        <BackgroundDecorations />
-        <Suspense fallback={<div className="h-16 border-b border-slate-100" />}>
+    <html
+      lang="en"
+      className={`${poppins.variable} ${inter.variable}`}
+      data-scroll-behavior="smooth"
+    >
+      <body className="min-h-screen flex flex-col bg-[#FAF9F6] text-[#263449] antialiased selection:bg-[#FF8A00] selection:text-white">
+        <Suspense fallback={<div className="h-16 bg-white border-b border-[#E2E8F0]" />}>
           <Navbar />
         </Suspense>
-        <main className="flex-grow z-10 relative">{children}</main>
+        <main className="flex-grow">{children}</main>
         <Footer />
       </body>
     </html>

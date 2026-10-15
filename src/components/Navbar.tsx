@@ -2,218 +2,197 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Search, Menu, X, Compass, ArrowRight, ShieldCheck } from 'lucide-react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { ShoppingBag, Menu, X, ArrowRight, Compass, Search } from 'lucide-react';
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [navSearch, setNavSearch] = useState('');
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setSearchOpen(false);
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Shop', href: '/shop' },
+    { name: 'E-Books', href: '/shop?category=E-Books' },
+    { name: 'PDFs', href: '/shop?category=PDF+Guides' },
     { name: 'Categories', href: '/categories' },
     { name: 'About', href: '/about' },
-    { name: 'FAQ', href: '/faq' },
     { name: 'Contact', href: '/contact' },
   ];
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleNavSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/shop?search=${encodeURIComponent(searchQuery.trim())}`;
+    if (navSearch.trim()) {
+      window.location.href = `/shop?search=${encodeURIComponent(navSearch.trim())}`;
     }
+  };
+
+  const isLinkActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href.includes('category=E-Books')) {
+      return pathname === '/shop' && searchParams.get('category') === 'E-Books';
+    }
+    if (href.includes('category=PDF+Guides')) {
+      return pathname === '/shop' && searchParams.get('category') === 'PDF Guides';
+    }
+    return pathname === href;
   };
 
   return (
     <>
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md shadow-sm border-b border-slate-200/80 dark:border-slate-800 py-3'
-            : 'bg-white/60 dark:bg-slate-950/60 backdrop-blur-sm border-b border-slate-100 dark:border-slate-900 py-4'
+        className={`sticky top-0 z-50 transition-all duration-300 bg-white border-b border-[#E2E8F0] ${
+          scrolled ? 'shadow-sm py-2.5' : 'py-3.5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* LOGO */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
-                <ShoppingBag className="w-5 h-5" />
+          <div className="flex items-center justify-between gap-4">
+            
+            {/* LOGO (Original GuideCart Identity Preserved) */}
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0 focus:outline-none">
+              <div className="w-10 h-10 rounded-xl bg-[#0B1635] flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
+                <ShoppingBag className="w-5 h-5 text-[#FF8A00]" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
-                  Guide<span className="text-indigo-600 dark:text-indigo-400">Cart</span>
+                <span className="font-heading font-extrabold text-xl tracking-tight text-[#0B1635] leading-none">
+                  Guide<span className="text-[#FF8A00]">Cart</span>
                 </span>
-                <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wider -mt-1">
-                  Digital Store
+                <span className="text-[10px] uppercase font-semibold text-[#64748B] tracking-wider mt-0.5">
+                  Digital Bookstore
                 </span>
               </div>
             </Link>
 
-            {/* DESKTOP NAV LINKS */}
-            <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+            {/* DESKTOP NAVIGATION LINKS */}
+            <nav className="hidden md:flex items-center gap-1 lg:gap-1.5" aria-label="Main Navigation">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href;
+                const active = isLinkActive(link.href);
                 return (
                   <Link
                     key={link.name}
                     href={link.href}
-                    className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors relative ${
-                      isActive
-                        ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
-                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-900'
+                    className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      active
+                        ? 'text-[#0B1635] font-semibold bg-[#F1F5FB]'
+                        : 'text-[#263449] hover:text-[#0B1635] hover:bg-[#F1F5FB]/70'
                     }`}
                   >
                     {link.name}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeNavIndicator"
-                        className="absolute bottom-0 left-3 right-3 h-0.5 bg-indigo-600 rounded-full"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
                   </Link>
                 );
               })}
             </nav>
 
-            {/* ACTION BUTTONS */}
+            {/* RIGHT SIDE ACTIONS: SEARCH TOGGLE & EXPLORE RESOURCES CTA */}
             <div className="flex items-center gap-3">
-              {/* Search Toggle */}
               <button
+                type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-900 transition-colors"
-                aria-label="Search"
+                className="p-2 rounded-lg text-[#263449] hover:text-[#0B1635] hover:bg-[#F1F5FB] transition-colors focus:outline-none"
+                aria-label="Toggle search input"
               >
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Admin Link Icon */}
-              <Link
-                href="/admin"
-                className="hidden sm:flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-indigo-600 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-indigo-200 transition-colors"
-                title="Admin Portal"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Admin</span>
-              </Link>
-
-              {/* Explore Products CTA */}
               <Link
                 href="/shop"
-                className="hidden sm:inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-indigo-100"
+                className="hidden sm:inline-flex items-center gap-2 bg-[#FF8A00] hover:bg-[#E87500] text-white text-sm font-semibold px-4.5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow hover:scale-[1.02] active:scale-95"
               >
                 <Compass className="w-4 h-4" />
-                <span>Explore Products</span>
+                <span>Explore Resources</span>
               </Link>
 
-              {/* Mobile Menu Toggle */}
+              {/* MOBILE MENU TOGGLE */}
               <button
+                type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                aria-label="Toggle menu"
+                className="md:hidden p-2 rounded-lg text-[#0B1635] hover:bg-[#F1F5FB] focus:outline-none"
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
+
           </div>
+
+          {/* SEARCH DRAWER */}
+          {searchOpen && (
+            <div className="pt-3 pb-2 border-t border-[#E2E8F0] mt-3">
+              <form onSubmit={handleNavSearchSubmit} className="relative max-w-xl mx-auto">
+                <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search practical guides, e-books, checklists..."
+                  value={navSearch}
+                  onChange={(e) => setNavSearch(e.target.value)}
+                  className="w-full pl-10 pr-20 py-2 text-sm bg-[#F1F5FB] border border-[#E2E8F0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF8A00] focus:bg-white text-[#0B1635] placeholder-[#64748B]"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-[#0B1635] text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[#173B75] transition-colors"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+          )}
+
         </div>
 
-        {/* SEARCH BAR OVERLAY */}
-        <AnimatePresence>
-          {searchOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden border-t border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-md"
-            >
-              <div className="max-w-4xl mx-auto px-4 py-3">
-                <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-                  <Search className="w-5 h-5 absolute left-3.5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search ebooks, guides, planners, checklists..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    autoFocus
-                    className="w-full pl-10 pr-24 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-colors"
-                  >
-                    Search
-                  </button>
-                </form>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* MOBILE MENU DRAWER */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="md:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 pt-3 pb-6 space-y-3"
-            >
-              <nav className="flex flex-col space-y-1">
-                {navLinks.map((link) => (
+        {/* MOBILE NAVIGATION MENU DRAWER */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-[#E2E8F0] px-4 pt-3 pb-6 space-y-3 shadow-lg">
+            <div className="space-y-1">
+              {navLinks.map((link) => {
+                const active = isLinkActive(link.href);
+                return (
                   <Link
                     key={link.name}
                     href={link.href}
-                    className={`px-4 py-2.5 rounded-lg text-base font-medium ${
-                      pathname === link.href
-                        ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-semibold'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900'
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      active
+                        ? 'bg-[#0B1635] text-white font-semibold'
+                        : 'text-[#263449] hover:bg-[#F1F5FB]'
                     }`}
                   >
                     {link.name}
                   </Link>
-                ))}
-              </nav>
+                );
+              })}
+            </div>
 
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
-                <Link
-                  href="/shop"
-                  className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-sm text-sm"
-                >
-                  <Compass className="w-4 h-4" />
-                  <span>Explore All Products</span>
-                </Link>
-
-                <Link
-                  href="/admin"
-                  className="w-full flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 font-medium py-2.5 rounded-xl text-sm"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Admin Dashboard</span>
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            <div className="pt-3 border-t border-[#E2E8F0]">
+              <Link
+                href="/shop"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#FF8A00] hover:bg-[#E87500] text-white font-semibold py-3 rounded-xl text-sm transition-all shadow-sm"
+              >
+                <Compass className="w-4 h-4" />
+                <span>Explore Resources</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
     </>
   );

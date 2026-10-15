@@ -10,19 +10,19 @@ interface FeatureListProps {
 
 export default function FeatureList({ features = [], whatYouGet = [] }: FeatureListProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* KEY FEATURES */}
       {features.length > 0 && (
-        <div className="bg-slate-50/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+        <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 sm:p-8 card-shadow">
+          <h3 className="font-heading font-bold text-lg text-[#0B1635] mb-4 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-[#FF8A00]" />
             <span>Key Features & Highlights</span>
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {features.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-2 shrink-0" />
+              <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-[#263449]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF8A00] mt-2 shrink-0" />
                 <span className="leading-snug">{item}</span>
               </div>
             ))}
@@ -30,18 +30,18 @@ export default function FeatureList({ features = [], whatYouGet = [] }: FeatureL
         </div>
       )}
 
-      {/* WHAT YOU'LL GET */}
+      {/* WHAT YOU WILL GET */}
       {whatYouGet.length > 0 && (
-        <div className="bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 rounded-3xl p-6 sm:p-8">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-            <PackageCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span>What You Will Get</span>
+        <div className="bg-[#F1F5FB] border border-[#E2E8F0] rounded-3xl p-6 sm:p-8">
+          <h3 className="font-heading font-bold text-lg text-[#0B1635] mb-4 flex items-center gap-2">
+            <PackageCheck className="w-5 h-5 text-[#0B1635]" />
+            <span>What You Will Receive</span>
           </h3>
 
-          <ul className="space-y-3 text-xs sm:text-sm text-slate-700 dark:text-slate-300">
+          <ul className="space-y-3 text-xs sm:text-sm text-[#263449]">
             {whatYouGet.map((item, idx) => (
               <li key={idx} className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="font-medium">{item}</span>
               </li>
             ))}

@@ -34,9 +34,11 @@ export default function AdminLoginPage() {
         
         {/* LOGO */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-indigo-900/50">
-            <ShoppingBag className="w-6 h-6" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="GuideCart Admin"
+            className="w-14 h-14 object-contain rounded-full mx-auto shadow-lg bg-white p-0.5"
+          />
           <h1 className="text-2xl font-bold text-white tracking-tight">GuideCart Admin</h1>
           <p className="text-xs text-slate-400">Sign in to manage your digital products store</p>
         </div>

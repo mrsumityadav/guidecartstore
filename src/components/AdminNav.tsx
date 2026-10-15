@@ -31,9 +31,11 @@ export default function AdminNav() {
           {/* LOGO & ADMIN BADGE */}
           <div className="flex items-center gap-6">
             <Link href="/admin" className="flex items-center gap-2 font-bold text-lg">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-                <ShoppingBag className="w-4 h-4" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="GuideCart Admin"
+                className="w-8 h-8 object-contain rounded-full shadow-xs"
+              />
               <span>GuideCart Admin</span>
             </Link>
 

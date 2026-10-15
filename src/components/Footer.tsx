@@ -13,9 +13,11 @@ export default function Footer() {
           {/* BRAND COLUMN */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5 inline-flex focus:outline-none">
-              <div className="w-10 h-10 rounded-xl bg-[#0B1635] border border-slate-700 flex items-center justify-center text-white shadow-sm">
-                <ShoppingBag className="w-5 h-5 text-[#FF8A00]" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="GuideCart Logo"
+                className="w-10 h-10 object-contain rounded-full bg-white p-0.5 shadow-sm"
+              />
               <span className="font-heading font-extrabold text-2xl tracking-tight text-white">
                 Guide<span className="text-[#FF8A00]">Cart</span>
               </span>

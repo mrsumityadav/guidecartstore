@@ -64,11 +64,13 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             
-            {/* LOGO (Original GuideCart Identity Preserved) */}
+            {/* LOGO */}
             <Link href="/" className="flex items-center gap-2.5 group shrink-0 focus:outline-none">
-              <div className="w-10 h-10 rounded-xl bg-[#0B1635] flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
-                <ShoppingBag className="w-5 h-5 text-[#FF8A00]" />
-              </div>
+              <img
+                src="/logo.png"
+                alt="GuideCart Logo"
+                className="w-10 h-10 object-contain rounded-full shadow-xs group-hover:scale-105 transition-transform"
+              />
               <div className="flex flex-col">
                 <span className="font-heading font-extrabold text-xl tracking-tight text-[#0B1635] leading-none">
                   Guide<span className="text-[#FF8A00]">Cart</span>

@@ -49,7 +49,7 @@ export const metadata: Metadata = {
       'High-quality digital guides, e-books, planners, and career toolkits designed for tangible progress.',
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/logo.png',
   },
 };
 
